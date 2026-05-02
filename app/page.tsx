@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
-import { getFeaturedProducts, CATEGORIES } from '@/lib/products';
+import { getAdminProducts } from '@/lib/adminStore';
+import { CATEGORIES } from '@/lib/products';
+import type { Product } from '@/lib/products';
 
 const HERO_STATS = [
   { value: '500+', label: 'Products' },
@@ -17,7 +19,11 @@ export default function HomePage() {
   const featuredRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const categoriesRef = useRef<HTMLDivElement>(null);
-  const featured = getFeaturedProducts();
+  const [featured, setFeatured] = useState<Product[]>([]);
+
+  useEffect(() => {
+    setFeatured(getAdminProducts().filter(p => p.featured && p.available));
+  }, []);
 
   useEffect(() => {
     let ctx: { revert: () => void } | null = null;
@@ -46,7 +52,7 @@ export default function HomePage() {
           ease: 'sine.inOut',
         });
 
-        // Hero image parallax
+        // Hero image parallax + scroll blur (premium depth)
         if (heroRef.current) {
           gsap.to('.hero-bg-img', {
             y: '-15%',
@@ -56,19 +62,41 @@ export default function HomePage() {
               start: 'top top',
               end: 'bottom top',
               scrub: true,
-            }
+            },
           });
+          gsap.fromTo(
+            '.hero-blur-layer',
+            { filter: 'blur(0px)', WebkitFilter: 'blur(0px)', scale: 1 },
+            {
+              filter: 'blur(14px)',
+              WebkitFilter: 'blur(14px)',
+              scale: 1.06,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: heroRef.current,
+                start: 'top top',
+                end: 'bottom top',
+                scrub: 0.6,
+              },
+            }
+          );
+          gsap.fromTo(
+            '.hero-overlay-dim',
+            { opacity: 0.35 },
+            {
+              opacity: 0.75,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: heroRef.current,
+                start: 'top top',
+                end: 'bottom top',
+                scrub: true,
+              },
+            }
+          );
         }
 
-        // Featured section reveal
-        gsap.fromTo('.featured-card',
-          { opacity: 0, y: 88, rotateX: 4 },
-          {
-            opacity: 1, y: 0, rotateX: 0, duration: 0.95, stagger: 0.16, ease: 'power3.out',
-            scrollTrigger: { trigger: featuredRef.current, start: 'top 80%' }
-          }
-        );
-
+        // Featured cards use framer-motion (ProductCard); keep heading reveal
         gsap.fromTo('.section-heading',
           { opacity: 0, y: 40 },
           {
@@ -114,6 +142,18 @@ export default function HomePage() {
     return () => ctx?.revert();
   }, []);
 
+  useEffect(() => {
+    if (!featured.length) return;
+    let cancelled = false;
+    (async () => {
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      if (!cancelled) ScrollTrigger.refresh();
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [featured.length]);
+
   return (
     <>
       {/* ── HERO ── */}
@@ -121,17 +161,26 @@ export default function HomePage() {
         {/* Background image */}
         <div className="absolute inset-0 z-0">
           <div className="hero-bg-img absolute inset-0 scale-110">
-            <Image
-              src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1920&q=80"
-              alt="Premium Hardware"
-              fill
-              className="object-cover opacity-20 dark:opacity-25"
-              priority
-            />
+            <div className="hero-blur-layer absolute inset-0 will-change-[filter,transform]">
+              <Image
+                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=88&auto=format&fit=crop"
+                alt="Premium architectural interior"
+                fill
+                className="object-cover opacity-[0.38] dark:opacity-[0.42]"
+                priority
+                sizes="100vw"
+              />
+            </div>
           </div>
+          {/* Scroll-darkening veil (GSAP opacity) */}
+          <div
+            className="hero-overlay-dim pointer-events-none absolute inset-0 z-[1] bg-black"
+            style={{ opacity: 0.28 }}
+            aria-hidden
+          />
           {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-stone-100 via-stone-100/90 dark:from-[#0A0A0A] dark:via-[#0A0A0A]/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-100 dark:from-[#0A0A0A] via-transparent to-transparent" />
+          <div className="absolute inset-0 z-[2] bg-gradient-to-r from-stone-100 via-stone-100/88 dark:from-[#0A0A0A] dark:via-[#0A0A0A]/78 to-transparent" />
+          <div className="absolute inset-0 z-[2] bg-gradient-to-t from-stone-100 dark:from-[#0A0A0A] via-transparent to-transparent" />
         </div>
 
         {/* Gold geometric decoration */}
@@ -222,11 +271,14 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {featured.slice(0, 4).map((product, i) => (
-            <div key={product.id} className="featured-card opacity-0">
-              <ProductCard product={product} index={i} />
-            </div>
+            <ProductCard key={product.id} product={product} index={i} />
           ))}
         </div>
+        {featured.length === 0 && (
+          <p className="text-center font-body text-sm text-stone-500 dark:text-gray-600">
+            No featured products right now. Mark items as featured in admin.
+          </p>
+        )}
       </section>
 
       {/* ── STATS BAND ── */}

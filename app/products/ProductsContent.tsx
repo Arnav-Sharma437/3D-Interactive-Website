@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { PRODUCTS, CATEGORIES } from '@/lib/products';
 import { getAdminProducts } from '@/lib/adminStore';
 import ProductCard from '@/components/ProductCard';
@@ -15,7 +15,6 @@ export default function ProductsContent() {
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
   const [search, setSearch] = useState('');
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
-  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setProducts(getAdminProducts());
@@ -32,17 +31,7 @@ export default function ProductsContent() {
     init();
   }, []);
 
-  useEffect(() => {
-    const animateGrid = async () => {
-      const { gsap } = await import('gsap');
-      const cards = document.querySelectorAll('.product-grid-card');
-      gsap.fromTo(cards,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: 'power2.out' }
-      );
-    };
-    animateGrid();
-  }, [activeCategory, showAvailableOnly, search]);
+  // Card enter animation is handled by framer-motion in ProductCard
 
   const filtered = products.filter((p: Product) => {
     const matchCat = activeCategory === 'All' || p.category === activeCategory;
@@ -112,11 +101,9 @@ export default function ProductsContent() {
           </div>
         </div>
 
-        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filtered.map((product: Product, i: number) => (
-            <div key={product.id} className="product-grid-card opacity-0">
-              <ProductCard product={product} index={i} />
-            </div>
+            <ProductCard key={product.id} product={product} index={i} />
           ))}
         </div>
 

@@ -25,9 +25,9 @@ export const PRODUCTS: Product[] = [
     shortDescription: "Hardened steel combination lock with 10,000 possible combinations.",
     category: "Locks & Security",
     images: [
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-      "https://images.unsplash.com/photo-1614521407086-f9dd0c6f4073?w=800&q=80",
-      "https://images.unsplash.com/photo-1580745277460-85cbb57e5c01?w=800&q=80"
+      "https://images.unsplash.com/photo-1580737149657-f85863707307?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1565814636199-ae713292f87e?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1580745277460-85cbb57e5c01?w=1200&q=88&auto=format&fit=crop"
     ],
     specifications: {
       "Material": "Hardened Steel",
@@ -51,9 +51,9 @@ export const PRODUCTS: Product[] = [
     shortDescription: "Premium brushed stainless steel lever handles with anti-corrosion finish.",
     category: "Door Hardware",
     images: [
-      "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&q=80",
-      "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585152486-eea023f6d0e6?w=1200&q=88&auto=format&fit=crop"
     ],
     specifications: {
       "Material": "SS304 Stainless Steel",
@@ -76,9 +76,9 @@ export const PRODUCTS: Product[] = [
     shortDescription: "Marine-grade stainless piano hinge with pre-drilled holes, 1800mm.",
     category: "Hinges",
     images: [
-      "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&q=80",
-      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
+      "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585153185-71e9c47f2405?w=1200&q=88&auto=format&fit=crop"
     ],
     specifications: {
       "Material": "Marine Grade SS316",
@@ -102,9 +102,9 @@ export const PRODUCTS: Product[] = [
     shortDescription: "Anti-snap, anti-drill, anti-pick 5-pin euro deadlock cylinder.",
     category: "Locks & Security",
     images: [
-      "https://images.unsplash.com/photo-1580745277460-85cbb57e5c01?w=800&q=80",
-      "https://images.unsplash.com/photo-1614521407086-f9dd0c6f4073?w=800&q=80",
-      "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&q=80"
+      "https://images.unsplash.com/photo-1580745277460-85cbb57e5c01?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1614521407086-f9dd0c6f4073?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=88&auto=format&fit=crop"
     ],
     specifications: {
       "Profile": "Euro TS007",
@@ -127,9 +127,9 @@ export const PRODUCTS: Product[] = [
     shortDescription: "Push-to-open, full-extension soft-close undermount slides, 40kg capacity.",
     category: "Drawer Systems",
     images: [
-      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
-      "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&q=80",
-      "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&q=80"
+      "https://images.unsplash.com/photo-1584622650111-993a426352bf?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&q=88&auto=format&fit=crop"
     ],
     specifications: {
       "Extension": "Full (100%)",
@@ -153,9 +153,9 @@ export const PRODUCTS: Product[] = [
     shortDescription: "Complete frameless glass door patch fitting set in satin chrome.",
     category: "Glass Fittings",
     images: [
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-      "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&q=80",
-      "https://images.unsplash.com/photo-1580745277460-85cbb57e5c01?w=800&q=80"
+      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&q=88&auto=format&fit=crop"
     ],
     specifications: {
       "Glass Thickness": "10–12mm",
@@ -178,9 +178,9 @@ export const PRODUCTS: Product[] = [
     shortDescription: "Solid brass heavy-duty tower bolt with smooth action, 300mm.",
     category: "Bolts & Latches",
     images: [
-      "https://images.unsplash.com/photo-1614521407086-f9dd0c6f4073?w=800&q=80",
-      "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&q=80",
-      "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&q=80"
+      "https://images.unsplash.com/photo-1614521407086-f9dd0c6f4073?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=88&auto=format&fit=crop"
     ],
     specifications: {
       "Material": "Solid Brass",
@@ -203,9 +203,9 @@ export const PRODUCTS: Product[] = [
     shortDescription: "Hydraulic floor spring for commercial doors up to 120kg with hold-open.",
     category: "Door Closers",
     images: [
-      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-      "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&q=80"
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=1200&q=88&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585152486-eea023f6d0e6?w=1200&q=88&auto=format&fit=crop"
     ],
     specifications: {
       "Door Weight": "Up to 120kg",

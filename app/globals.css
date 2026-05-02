@@ -106,16 +106,27 @@ body {
   margin-top: 12px;
 }
 
-/* Admin specific */
+/* Admin + forms (light + dark) */
 .admin-input {
-  background: #111111;
-  border: 1px solid #1E1E1E;
-  color: white;
+  background: #ffffff;
+  border: 1px solid #d6d3d1;
+  color: #1c1917;
   padding: 10px 16px;
   border-radius: 6px;
   width: 100%;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
   font-family: var(--font-jost);
+}
+.dark .admin-input {
+  background: #111111;
+  border: 1px solid #1E1E1E;
+  color: white;
+}
+.admin-input::placeholder {
+  color: #78716c;
+}
+.dark .admin-input::placeholder {
+  color: #6b6b6b;
 }
 .admin-input:focus {
   outline: none;

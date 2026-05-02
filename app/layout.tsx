@@ -4,6 +4,7 @@ import { Providers } from './providers';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { FloatingWhatsApp } from '@/components/WhatsAppButton';
+import StickyCTA from '@/components/StickyCTA';
 
 export const metadata: Metadata = {
   title: {
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="min-h-screen">{children}</main>
           <Footer />
           <FloatingWhatsApp />
+          <StickyCTA />
         </Providers>
       </body>
     </html>

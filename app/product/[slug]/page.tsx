@@ -8,6 +8,7 @@ import { PRODUCTS } from '@/lib/products';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import ProductCard from '@/components/ProductCard';
 import type { Product } from '@/lib/products';
+import { imageUnoptimized } from '@/lib/imageUtils';
 
 /** Next.js 14: `params` is a plain object (not a Promise). */
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
@@ -124,6 +125,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                 className="object-cover transition-all duration-700"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
+                unoptimized={imageUnoptimized(product.images[activeImage])}
               />
               {!product.available && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -148,7 +150,14 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                       activeImage === i ? 'border-gold' : 'border-stone-300 dark:border-[#1E1E1E] hover:border-gold/50'
                     }`}
                   >
-                    <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="80px" />
+                    <Image
+                      src={img}
+                      alt={`${product.name} ${i + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                      unoptimized={imageUnoptimized(img)}
+                    />
                   </button>
                 ))}
               </div>

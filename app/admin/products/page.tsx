@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getAdminProducts, deleteProduct } from '@/lib/adminStore';
-import { PRODUCTS } from '@/lib/products';
+import { getAdminProducts, deleteProduct, updateProduct } from '@/lib/adminStore';
+import { imageUnoptimized } from '@/lib/imageUtils';
 import type { Product } from '@/lib/products';
 
 export default function AdminProductsPage() {
@@ -26,7 +26,6 @@ export default function AdminProductsPage() {
   };
 
   const handleToggleAvailable = (id: string) => {
-    const { updateProduct } = require('@/lib/adminStore');
     const product = products.find(p => p.id === id);
     if (!product) return;
     updateProduct(id, { available: !product.available });
@@ -34,13 +33,16 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-10">
+    <div className="p-4 sm:p-6 md:p-8">
+      <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-display font-bold mb-1">All Products</h1>
-          <p className="text-gray-500 text-sm font-body">{products.length} products total</p>
+          <h1 className="font-display text-2xl font-bold text-stone-900 dark:text-white md:text-3xl">All Products</h1>
+          <p className="mt-1 font-body text-sm text-stone-600 dark:text-gray-500">{products.length} products total</p>
         </div>
-        <Link href="/admin/products/new" className="bg-[#C9A84C] hover:bg-[#E8C96D] text-black px-6 py-3 text-xs tracking-widest uppercase font-medium font-body transition-colors">
+        <Link
+          href="/admin/products/new"
+          className="inline-flex justify-center bg-gold px-6 py-3 font-body text-xs font-medium uppercase tracking-widest text-black transition-colors hover:bg-gold-light"
+        >
           + Add Product
         </Link>
       </div>
@@ -49,43 +51,48 @@ export default function AdminProductsPage() {
         {products.map(p => (
           <div
             key={p.id}
-            className={`flex items-center gap-5 bg-[#111] border border-[#1E1E1E] hover:border-[#C9A84C]/20 p-4 transition-all ${deleting === p.id ? 'opacity-0 scale-95' : 'opacity-100'}`}
+            className={`flex flex-col gap-4 border border-stone-200 bg-white p-4 transition-all dark:border-[#1E1E1E] dark:bg-[#111] dark:hover:border-gold/20 sm:flex-row sm:items-center sm:gap-5 ${
+              deleting === p.id ? 'scale-95 opacity-0' : 'opacity-100'
+            }`}
           >
-            {/* Thumb */}
-            <div className="relative w-16 h-16 shrink-0 overflow-hidden bg-[#0D0D0D]">
-              <Image src={p.images[0]} alt={p.name} fill className="object-cover" sizes="64px" />
+            <div className="flex flex-1 items-start gap-4 min-w-0">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden bg-stone-100 dark:bg-[#0D0D0D]">
+                <Image
+                  src={p.images[0]}
+                  alt={p.name}
+                  fill
+                  className="object-cover"
+                  sizes="64px"
+                  unoptimized={imageUnoptimized(p.images[0] || '')}
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-body text-sm font-medium text-stone-900 dark:text-white">{p.name}</div>
+                <div className="mt-0.5 text-xs text-stone-500 dark:text-gray-600">{p.category}</div>
+                <div className="mt-1 font-display text-sm text-gold">₹{p.price.toLocaleString('en-IN')}</div>
+              </div>
             </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="text-white text-sm font-body truncate">{p.name}</div>
-              <div className="text-xs text-gray-600 mt-0.5">{p.category}</div>
-              <div className="text-[#C9A84C] text-sm font-display mt-1">₹{p.price.toLocaleString('en-IN')}</div>
-            </div>
-
-            {/* Status toggle */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-wrap items-center gap-2 border-t border-stone-100 pt-3 dark:border-[#1A1A1A] sm:border-0 sm:pt-0">
               <button
+                type="button"
                 onClick={() => handleToggleAvailable(p.id)}
-                className={`text-[10px] tracking-widest uppercase px-3 py-1.5 border transition-all font-body ${
+                className={`text-[10px] font-body uppercase tracking-widest transition-colors ${
                   p.available
-                    ? 'border-green-700 text-green-400 hover:bg-red-900/20 hover:text-red-400 hover:border-red-700'
-                    : 'border-red-800 text-red-400 hover:bg-green-900/20 hover:text-green-400 hover:border-green-700'
+                    ? 'border border-green-700 px-3 py-1.5 text-green-700 hover:border-red-600 hover:text-red-600 dark:text-green-400'
+                    : 'border border-red-700 px-3 py-1.5 text-red-600 hover:border-green-600 hover:text-green-600 dark:text-red-400'
                 }`}
                 title="Toggle availability"
               >
                 {p.available ? 'In Stock' : 'Out of Stock'}
               </button>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3 shrink-0">
-              <Link href={`/product/${p.slug}`} target="_blank" className="text-xs text-gray-600 hover:text-white font-body transition-colors">View</Link>
-              <Link href={`/admin/products/${p.id}/edit`} className="text-xs text-[#C9A84C] hover:text-white font-body transition-colors">Edit</Link>
-              <button
-                onClick={() => handleDelete(p.id, p.name)}
-                className="text-xs text-red-800 hover:text-red-400 font-body transition-colors"
-              >
+              <Link href={`/product/${p.slug}`} target="_blank" className="text-xs font-body text-stone-600 transition hover:text-gold dark:text-gray-500">
+                View
+              </Link>
+              <Link href={`/admin/products/${p.id}/edit`} className="text-xs font-body text-gold transition hover:underline">
+                Edit
+              </Link>
+              <button type="button" onClick={() => handleDelete(p.id, p.name)} className="text-xs font-body text-red-700 transition hover:text-red-500 dark:text-red-800 dark:hover:text-red-400">
                 Delete
               </button>
             </div>
@@ -94,9 +101,11 @@ export default function AdminProductsPage() {
       </div>
 
       {products.length === 0 && (
-        <div className="text-center py-20">
-          <p className="text-gray-600 font-body mb-4">No products yet</p>
-          <Link href="/admin/products/new" className="text-[#C9A84C] text-sm hover:underline">Add your first product →</Link>
+        <div className="py-20 text-center">
+          <p className="mb-4 font-body text-stone-600 dark:text-gray-600">No products yet</p>
+          <Link href="/admin/products/new" className="text-sm text-gold hover:underline">
+            Add your first product →
+          </Link>
         </div>
       )}
     </div>
