@@ -25,6 +25,26 @@ export default function HomePage() {
     setFeatured(getAdminProducts().filter(p => p.featured && p.available));
   }, []);
 
+  /** Deep links: /#about, /#contact after navigation from other pages */
+  useEffect(() => {
+    const run = () => {
+      const hash = typeof window !== 'undefined' ? window.location.hash : '';
+      if (hash !== '#about' && hash !== '#contact') return;
+      const id = hash.slice(1);
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    run();
+    const t = window.setTimeout(run, 150);
+    const t2 = window.setTimeout(run, 450);
+    window.addEventListener('hashchange', run);
+    return () => {
+      window.clearTimeout(t);
+      window.clearTimeout(t2);
+      window.removeEventListener('hashchange', run);
+    };
+  }, []);
+
   useEffect(() => {
     let ctx: { revert: () => void } | null = null;
 
@@ -82,9 +102,9 @@ export default function HomePage() {
           );
           gsap.fromTo(
             '.hero-overlay-dim',
-            { opacity: 0.35 },
+            { opacity: 0.14 },
             {
-              opacity: 0.75,
+              opacity: 0.42,
               ease: 'none',
               scrollTrigger: {
                 trigger: heroRef.current,
@@ -166,7 +186,7 @@ export default function HomePage() {
                 src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=88&auto=format&fit=crop"
                 alt="Premium architectural interior"
                 fill
-                className="object-cover opacity-[0.38] dark:opacity-[0.42]"
+                className="object-cover opacity-[0.58] dark:opacity-[0.5]"
                 priority
                 sizes="100vw"
               />
@@ -175,12 +195,12 @@ export default function HomePage() {
           {/* Scroll-darkening veil (GSAP opacity) */}
           <div
             className="hero-overlay-dim pointer-events-none absolute inset-0 z-[1] bg-black"
-            style={{ opacity: 0.28 }}
+            style={{ opacity: 0.1 }}
             aria-hidden
           />
-          {/* Gradient overlays */}
-          <div className="absolute inset-0 z-[2] bg-gradient-to-r from-stone-100 via-stone-100/88 dark:from-[#0A0A0A] dark:via-[#0A0A0A]/78 to-transparent" />
-          <div className="absolute inset-0 z-[2] bg-gradient-to-t from-stone-100 dark:from-[#0A0A0A] via-transparent to-transparent" />
+          {/* Gradient overlays — lighter so photo reads clearly */}
+          <div className="absolute inset-0 z-[2] bg-gradient-to-r from-stone-100/95 via-stone-100/55 dark:from-[#0A0A0A]/92 dark:via-[#0A0A0A]/55 to-transparent" />
+          <div className="absolute inset-0 z-[2] bg-gradient-to-t from-stone-100/90 dark:from-[#0A0A0A]/85 via-transparent to-transparent" />
         </div>
 
         {/* Gold geometric decoration */}
@@ -324,8 +344,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA BAND ── */}
-      <section className="relative py-24 overflow-hidden mx-6 mb-24">
+      {/* ── ABOUT (nav #about) ── */}
+      <section
+        id="about"
+        className="scroll-mt-24 border-y border-stone-200 bg-gradient-to-b from-stone-50 to-stone-100 py-16 dark:border-[#1E1E1E] dark:from-[#0C0C0C] dark:to-[#080808] md:py-24"
+      >
+        <div className="mx-auto max-w-7xl px-6">
+          <p className="mb-3 font-body text-[10px] uppercase tracking-[0.5em] text-gold">About Hakimi</p>
+          <h2 className="mb-8 font-display text-3xl font-bold leading-tight text-stone-900 dark:text-white md:text-5xl">
+            Architectural hardware <span className="gold-text">built to last</span>
+          </h2>
+          <div className="grid gap-8 font-body leading-relaxed text-stone-600 dark:text-gray-400 md:grid-cols-2 md:gap-12">
+            <p>
+              We supply premium locks, handles, hinges, glass fittings, and door hardware for homes, offices, and retail
+              spaces across India. Every product is chosen for finish, strength, and fit — so your doors and fixtures feel
+              as good as they look.
+            </p>
+            <p>
+              From bulk orders for builders to custom specs for architects, our team works with you on timelines,
+              finishes, and installation-ready kits. Browse the catalogue or reach out on WhatsApp for a quote tailored to
+              your project.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA / CONTACT (nav #contact) ── */}
+      <section id="contact" className="relative scroll-mt-24 overflow-hidden py-24 mx-6 mb-24">
         <div className="absolute inset-0 border border-gold/20" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />

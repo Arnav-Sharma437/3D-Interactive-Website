@@ -20,13 +20,13 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="p-4 sm:p-6 md:p-8">
+    <div className="w-full min-w-0 max-w-[100vw] p-3 sm:p-6 md:p-8">
       <div className="mb-8 md:mb-10">
         <h1 className="font-display text-2xl font-bold text-stone-900 dark:text-white md:text-3xl">Dashboard</h1>
         <p className="mt-1 font-body text-sm text-stone-600 dark:text-gray-500">Welcome to Hakimi Admin Panel</p>
       </div>
 
-      <div className="mb-8 grid grid-cols-2 gap-3 md:mb-10 md:grid-cols-2 lg:grid-cols-4 md:gap-4">
+      <div className="mb-8 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 md:mb-10 lg:grid-cols-4 md:gap-4">
         {[
           { label: 'Total Products', value: stats.total, className: 'text-stone-900 dark:text-white' },
           { label: 'In Stock', value: stats.available, className: 'text-green-700 dark:text-green-400' },
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
 
       <div>
         <h2 className="mb-4 font-body text-sm uppercase tracking-widest text-stone-600 dark:text-gray-500">Recent Products</h2>
-        <div className="overflow-x-auto border border-stone-200 dark:border-[#1E1E1E]">
+        <div className="-mx-3 overflow-x-auto rounded-lg border border-stone-200 sm:mx-0 dark:border-[#1E1E1E]">
           <table className="w-full min-w-[600px] font-body text-sm">
             <thead>
               <tr className="border-b border-stone-200 bg-stone-50 dark:border-[#1E1E1E] dark:bg-[#0D0D0D]">

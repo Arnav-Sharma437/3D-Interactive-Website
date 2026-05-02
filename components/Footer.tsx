@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SectionLink from '@/components/SectionLink';
 
 export default function Footer() {
   return (
@@ -27,9 +28,31 @@ export default function Footer() {
         <div>
           <h4 className="text-xs tracking-[0.3em] uppercase text-[#C9A84C] mb-5 font-body">Navigation</h4>
           <ul className="space-y-3">
-            {[['Home', '/'], ['Products', '/products'], ['About Us', '/#about'], ['Contact', '/#contact'], ['Admin', '/admin']].map(([l, h]) => (
+            {(
+              [
+                ['Home', '/'],
+                ['Products', '/products'],
+                ['About Us', '/#about'],
+                ['Contact', '/#contact'],
+                ['Admin', '/admin'],
+              ] as const
+            ).map(([l, h]) => (
               <li key={l}>
-                <Link href={h} className="text-sm text-stone-600 dark:text-gray-500 hover:text-stone-900 dark:hover:text-white transition-colors font-body">{l}</Link>
+                {h.startsWith('/#') ? (
+                  <SectionLink
+                    href={h}
+                    className="font-body text-sm text-stone-600 transition-colors hover:text-stone-900 dark:text-gray-500 dark:hover:text-white"
+                  >
+                    {l}
+                  </SectionLink>
+                ) : (
+                  <Link
+                    href={h}
+                    className="font-body text-sm text-stone-600 transition-colors hover:text-stone-900 dark:text-gray-500 dark:hover:text-white"
+                  >
+                    {l}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

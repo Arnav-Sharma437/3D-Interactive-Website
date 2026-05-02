@@ -1,26 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { getAdminSession, setAdminSession } from '@/lib/adminSession';
 
 const ADMIN_PASSWORD = 'hakimi2024'; // Change + move to env for production
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
+  useEffect(() => {
+    if (getAdminSession()) setAuthenticated(true);
+    setSessionChecked(true);
+  }, []);
+
   const tryLogin = () => {
     if (password === ADMIN_PASSWORD) {
+      setAdminSession(true);
       setAuthenticated(true);
       setError('');
     } else {
       setError('Incorrect password');
     }
   };
+
+  if (!sessionChecked) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-stone-100 dark:bg-[#0A0A0A]">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-gold border-t-transparent" aria-hidden />
+      </div>
+    );
+  }
 
   if (!authenticated) {
     return (
@@ -139,7 +155,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
           <button
             type="button"
-            onClick={() => setAuthenticated(false)}
+            onClick={() => {
+              setAdminSession(false);
+              setAuthenticated(false);
+            }}
             className="mt-3 block font-body text-xs uppercase tracking-widest text-red-700 transition hover:text-red-500 dark:text-red-800 dark:hover:text-red-400"
           >
             Logout
@@ -148,7 +167,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main */}
-      <main className="min-h-screen pt-14 md:ml-60 md:pt-0">{children}</main>
+      <main className="min-h-screen w-full min-w-0 overflow-x-hidden pt-14 md:ml-60 md:pt-0">{children}</main>
     </div>
   );
 }
