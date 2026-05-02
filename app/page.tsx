@@ -31,12 +31,20 @@ export default function HomePage() {
         // Hero Timeline
         const heroTl = gsap.timeline({ defaults: { ease: 'power4.out' } });
         heroTl
-          .fromTo('.hero-eyebrow', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.3 })
-          .fromTo('.hero-title-line', { opacity: 0, y: 80, skewY: 4 }, { opacity: 1, y: 0, skewY: 0, duration: 1.3, stagger: 0.18 }, '-=0.4')
-          .fromTo('.hero-subtitle', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.9 }, '-=0.7')
-          .fromTo('.hero-cta', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.12 }, '-=0.5')
-          .fromTo('.hero-divider', { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 1.4, ease: 'power2.inOut' }, '-=1.2')
-          .fromTo('.hero-stat', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.1 }, '-=0.4');
+          .fromTo('.hero-eyebrow', { opacity: 0, y: 28, filter: 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.85, delay: 0.25 })
+          .fromTo('.hero-title-line', { opacity: 0, y: 110, skewY: 5, rotateX: 8 }, { opacity: 1, y: 0, skewY: 0, rotateX: 0, duration: 1.35, stagger: 0.2 }, '-=0.45')
+          .fromTo('.hero-subtitle', { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.95 }, '-=0.75')
+          .fromTo('.hero-cta', { opacity: 0, y: 28, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.75, stagger: 0.14 }, '-=0.55')
+          .fromTo('.hero-divider', { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 1.5, ease: 'power2.inOut' }, '-=1.25')
+          .fromTo('.hero-stat', { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.65, stagger: 0.12 }, '-=0.45');
+
+        gsap.to('.hero-float', {
+          y: 18,
+          duration: 3.2,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        });
 
         // Hero image parallax
         if (heroRef.current) {
@@ -54,9 +62,9 @@ export default function HomePage() {
 
         // Featured section reveal
         gsap.fromTo('.featured-card',
-          { opacity: 0, y: 70 },
+          { opacity: 0, y: 88, rotateX: 4 },
           {
-            opacity: 1, y: 0, duration: 0.9, stagger: 0.14, ease: 'power3.out',
+            opacity: 1, y: 0, rotateX: 0, duration: 0.95, stagger: 0.16, ease: 'power3.out',
             scrollTrigger: { trigger: featuredRef.current, start: 'top 80%' }
           }
         );
@@ -117,60 +125,61 @@ export default function HomePage() {
               src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1920&q=80"
               alt="Premium Hardware"
               fill
-              className="object-cover opacity-25"
+              className="object-cover opacity-20 dark:opacity-25"
               priority
             />
           </div>
           {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-stone-100 via-stone-100/90 dark:from-[#0A0A0A] dark:via-[#0A0A0A]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-100 dark:from-[#0A0A0A] via-transparent to-transparent" />
         </div>
 
         {/* Gold geometric decoration */}
-        <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#C9A84C]/30 to-transparent hidden lg:block" />
-        <div className="absolute right-[20%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#C9A84C]/10 to-transparent hidden lg:block" />
+        <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gold/30 to-transparent hidden lg:block" />
+        <div className="absolute right-[20%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gold/10 to-transparent hidden lg:block" />
+        <div className="hero-float pointer-events-none absolute right-[10%] top-[18%] h-28 w-28 rounded-full border border-gold/25 opacity-50 hidden lg:block" style={{ transformStyle: 'preserve-3d' }} />
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20 w-full">
           <div className="max-w-3xl">
             <div className="hero-eyebrow flex items-center gap-4 mb-8 opacity-0">
-              <div className="h-px w-12 bg-[#C9A84C]" />
-              <span className="text-xs tracking-[0.5em] uppercase text-[#C9A84C] font-body">Premium Hardware Collection</span>
+              <div className="h-px w-12 bg-gold" />
+              <span className="text-xs tracking-[0.5em] uppercase text-gold font-body">Premium Hardware Collection</span>
             </div>
 
-            <h1 className="font-display font-bold leading-[0.9] mb-8 overflow-hidden">
-              <div className="hero-title-line opacity-0 block text-5xl md:text-7xl xl:text-8xl">Crafted</div>
+            <h1 className="font-display font-bold leading-[0.9] mb-8 overflow-hidden [perspective:1000px]">
+              <div className="hero-title-line opacity-0 block text-5xl md:text-7xl xl:text-8xl text-stone-900 dark:text-white">Crafted</div>
               <div className="hero-title-line opacity-0 block text-5xl md:text-7xl xl:text-8xl gold-text">For</div>
-              <div className="hero-title-line opacity-0 block text-5xl md:text-7xl xl:text-8xl">Perfection.</div>
+              <div className="hero-title-line opacity-0 block text-5xl md:text-7xl xl:text-8xl text-stone-900 dark:text-white">Perfection.</div>
             </h1>
 
-            <p className="hero-subtitle opacity-0 text-gray-400 text-lg max-w-xl leading-relaxed font-body mb-10">
+            <p className="hero-subtitle opacity-0 text-stone-600 dark:text-gray-400 text-lg max-w-xl leading-relaxed font-body mb-10">
               Architectural hardware engineered to endure. Explore our collection of locks, handles, hinges, and glass fittings — built for modern spaces that demand precision.
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link href="/products" className="hero-cta opacity-0 magnetic-btn group relative overflow-hidden bg-[#C9A84C] hover:bg-[#E8C96D] text-black px-8 py-4 text-sm tracking-widest uppercase font-medium font-body transition-colors duration-300">
+              <Link href="/products" className="hero-cta opacity-0 magnetic-btn group relative overflow-hidden bg-gold hover:bg-gold-light text-black px-8 py-4 text-sm tracking-widest uppercase font-medium font-body transition-colors duration-300">
                 Browse Products
               </Link>
               <a
                 href={`https://wa.me/919999999999?text=${encodeURIComponent("Hi, I'd like to know more about your hardware products.")}`}
                 target="_blank"
                 rel="noreferrer"
-                className="hero-cta opacity-0 magnetic-btn group border border-white/20 hover:border-[#C9A84C] text-white hover:text-[#C9A84C] px-8 py-4 text-sm tracking-widest uppercase font-medium font-body transition-all duration-300"
+                className="hero-cta opacity-0 magnetic-btn group border border-stone-300/80 dark:border-white/20 hover:border-gold text-stone-800 dark:text-white hover:text-gold px-8 py-4 text-sm tracking-widest uppercase font-medium font-body transition-all duration-300"
               >
                 WhatsApp Us
               </a>
             </div>
 
             {/* Divider */}
-            <div className="hero-divider mt-16 h-px bg-gradient-to-r from-[#C9A84C]/50 via-[#C9A84C]/20 to-transparent" />
+            <div className="hero-divider mt-16 h-px bg-gradient-to-r from-gold/50 via-gold/20 to-transparent" />
 
             {/* Stats */}
             <div className="mt-10 flex gap-12">
               {HERO_STATS.map(stat => (
                 <div key={stat.value} className="hero-stat opacity-0">
                   <div className="text-2xl font-display font-bold gold-text">{stat.value}</div>
-                  <div className="text-[11px] tracking-widest uppercase text-gray-500 mt-1 font-body">{stat.label}</div>
+                  <div className="text-[11px] tracking-widest uppercase text-stone-500 dark:text-gray-500 mt-1 font-body">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -179,18 +188,18 @@ export default function HomePage() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="text-[10px] tracking-[0.4em] uppercase text-gray-600">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-[#C9A84C]/50 to-transparent animate-pulse" />
+          <span className="text-[10px] tracking-[0.4em] uppercase text-stone-500 dark:text-gray-600">Scroll</span>
+          <div className="w-px h-12 bg-gradient-to-b from-gold/50 to-transparent animate-pulse" />
         </div>
       </section>
 
       {/* ── MARQUEE TICKER ── */}
-      <div className="border-y border-[#1E1E1E] bg-[#080808] py-4 overflow-hidden">
+      <div className="border-y border-stone-200 dark:border-[#1E1E1E] bg-stone-50 dark:bg-[#080808] py-4 overflow-hidden transition-colors">
         <div className="marquee-inner flex whitespace-nowrap">
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center gap-12 px-6 shrink-0">
               {['Architectural Hardware', '✦', 'Premium Locks', '✦', 'Door Handles', '✦', 'Glass Fittings', '✦', 'Hinges', '✦', 'Floor Springs', '✦', 'Drawer Slides', '✦'].map((t, j) => (
-                <span key={j} className={`text-xs tracking-[0.4em] uppercase font-body ${t === '✦' ? 'text-[#C9A84C]' : 'text-gray-600'}`}>{t}</span>
+                <span key={j} className={`text-xs tracking-[0.4em] uppercase font-body ${t === '✦' ? 'text-gold' : 'text-stone-500 dark:text-gray-600'}`}>{t}</span>
               ))}
             </div>
           ))}
@@ -201,12 +210,12 @@ export default function HomePage() {
       <section ref={featuredRef} className="max-w-7xl mx-auto px-6 py-24">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-14 gap-6">
           <div>
-            <div className="section-heading opacity-0 text-[10px] tracking-[0.5em] uppercase text-[#C9A84C] mb-3 font-body">Curated Selection</div>
-            <h2 className="section-heading opacity-0 text-4xl md:text-5xl font-display font-bold leading-tight">
+            <div className="section-heading opacity-0 text-[10px] tracking-[0.5em] uppercase text-gold mb-3 font-body">Curated Selection</div>
+            <h2 className="section-heading opacity-0 text-4xl md:text-5xl font-display font-bold leading-tight text-stone-900 dark:text-white">
               Featured<br /><span className="gold-text">Products</span>
             </h2>
           </div>
-          <Link href="/products" className="section-heading opacity-0 text-xs tracking-widest uppercase text-gray-500 hover:text-[#C9A84C] transition-colors border-b border-gray-700 hover:border-[#C9A84C] pb-1 font-body">
+          <Link href="/products" className="section-heading opacity-0 text-xs tracking-widest uppercase text-stone-500 dark:text-gray-500 hover:text-gold transition-colors border-b border-stone-300 dark:border-gray-700 hover:border-gold pb-1 font-body">
             View All Products →
           </Link>
         </div>
@@ -222,19 +231,19 @@ export default function HomePage() {
 
       {/* ── STATS BAND ── */}
       <section ref={statsRef} className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#080808] via-[#0D0D0D] to-[#080808]" />
-        <div className="absolute inset-0 opacity-5" style={{backgroundImage: 'radial-gradient(circle at 50% 50%, #C9A84C 1px, transparent 1px)', backgroundSize: '40px 40px'}} />
+        <div className="absolute inset-0 bg-gradient-to-r from-stone-100 via-stone-50 dark:from-[#080808] dark:via-[#0D0D0D] dark:to-[#080808]" />
+        <div className="absolute inset-0 opacity-[0.07] dark:opacity-5" style={{backgroundImage: 'radial-gradient(circle at 50% 50%, #C9A84C 1px, transparent 1px)', backgroundSize: '40px 40px'}} />
         <div className="relative max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1E1E1E]">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-stone-200 dark:bg-[#1E1E1E]">
             {[
               { n: '500+', l: 'Products in Catalog' },
               { n: '15+', l: 'Years of Excellence' },
               { n: '10,000+', l: 'Projects Completed' },
               { n: '24hr', l: 'WhatsApp Response' },
             ].map(s => (
-              <div key={s.n} className="stat-item opacity-0 bg-[#0A0A0A] p-10 text-center group hover:bg-[#111] transition-colors">
+              <div key={s.n} className="stat-item opacity-0 bg-white dark:bg-[#0A0A0A] p-10 text-center group hover:bg-stone-50 dark:hover:bg-[#111] transition-colors">
                 <div className="text-3xl md:text-4xl font-display font-bold gold-text mb-2 group-hover:gold-shimmer">{s.n}</div>
-                <div className="text-[11px] tracking-widest uppercase text-gray-500 font-body">{s.l}</div>
+                <div className="text-[11px] tracking-widest uppercase text-stone-500 dark:text-gray-500 font-body">{s.l}</div>
               </div>
             ))}
           </div>
@@ -244,20 +253,20 @@ export default function HomePage() {
       {/* ── CATEGORIES ── */}
       <section ref={categoriesRef} className="max-w-7xl mx-auto px-6 py-24">
         <div className="mb-14">
-          <div className="cat-item opacity-0 text-[10px] tracking-[0.5em] uppercase text-[#C9A84C] mb-3 font-body">Shop By Category</div>
-          <h2 className="cat-item opacity-0 text-4xl md:text-5xl font-display font-bold">Browse <span className="gold-text">Categories</span></h2>
+          <div className="cat-item opacity-0 text-[10px] tracking-[0.5em] uppercase text-gold mb-3 font-body">Shop By Category</div>
+          <h2 className="cat-item opacity-0 text-4xl md:text-5xl font-display font-bold text-stone-900 dark:text-white">Browse <span className="gold-text">Categories</span></h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat}
               href={`/products?category=${encodeURIComponent(cat)}`}
-              className="cat-item opacity-0 group p-5 border border-[#1E1E1E] hover:border-[#C9A84C]/40 text-center transition-all duration-300 hover:bg-[#111]"
+              className="cat-item opacity-0 group p-5 border border-stone-200 dark:border-[#1E1E1E] hover:border-gold/40 text-center transition-all duration-300 hover:bg-stone-50 dark:hover:bg-[#111]"
             >
               <div className="text-2xl mb-3">
                 {cat === 'Locks & Security' ? '🔒' : cat === 'Door Hardware' ? '🚪' : cat === 'Hinges' ? '⚙️' : cat === 'Drawer Systems' ? '🗄️' : cat === 'Glass Fittings' ? '🔮' : cat === 'Bolts & Latches' ? '🔩' : '🔧'}
               </div>
-              <div className="text-xs text-gray-400 group-hover:text-[#C9A84C] transition-colors tracking-wider font-body leading-snug">{cat}</div>
+              <div className="text-xs text-stone-600 dark:text-gray-400 group-hover:text-gold transition-colors tracking-wider font-body leading-snug">{cat}</div>
             </Link>
           ))}
         </div>
@@ -265,15 +274,15 @@ export default function HomePage() {
 
       {/* ── CTA BAND ── */}
       <section className="relative py-24 overflow-hidden mx-6 mb-24">
-        <div className="absolute inset-0 border border-[#C9A84C]/20" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent" />
+        <div className="absolute inset-0 border border-gold/20" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
         <div className="relative text-center px-6">
-          <div className="text-[10px] tracking-[0.5em] uppercase text-[#C9A84C] mb-4 font-body">Get In Touch</div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold mb-6">
+          <div className="text-[10px] tracking-[0.5em] uppercase text-gold mb-4 font-body">Get In Touch</div>
+          <h2 className="text-4xl md:text-6xl font-display font-bold mb-6 text-stone-900 dark:text-white">
             Need a Custom <span className="gold-text">Quote?</span>
           </h2>
-          <p className="text-gray-400 mb-10 max-w-xl mx-auto font-body">
+          <p className="text-stone-600 dark:text-gray-400 mb-10 max-w-xl mx-auto font-body">
             Chat with us on WhatsApp for bulk orders, custom specifications, or product enquiries. We respond within 24 hours.
           </p>
           <a
