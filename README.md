@@ -21,7 +21,7 @@ I **cannot** log into your Vercel account from here. Follow these steps once:
 4. Click **Deploy**. After the build, you get a live URL like `https://3d-interactive-website-xxx.vercel.app`.
 5. Every future **`git push` to `main`** will **auto-deploy**.
 
-**Admin on production:** `https://<your-vercel-url>/admin` — same password as local (`hakimi2024` until you change it in `app/admin/layout.tsx`).
+**Admin (production):** Not linked from the public site. Use a **secret path** + **Google reCAPTCHA v3** — see **Security** below. Change the default password in `app/admin/layout.tsx`.
 
 ### Optional: stop the confusing GitHub Pages site
 
@@ -47,10 +47,27 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Security (admin)
+
+1. **Secret URL:** Set the **same** value in Vercel / `.env.local`:
+   - `ADMIN_SECRET_PATH` — e.g. `hq-panel-a7k9m2x` (long random segment, not `admin`)
+   - `NEXT_PUBLIC_ADMIN_PATH` — **must match** (needed for dashboard links)
+
+   Then open `https://yoursite.vercel.app/<that-segment>` — ** `/admin` redirects home** when a custom secret is set.
+
+2. **reCAPTCHA v3:** [Google Admin Console](https://www.google.com/recaptcha/admin) → register site → copy:
+   - `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`
+   - `RECAPTCHA_SECRET_KEY`
+
+   Without keys, **production login is blocked**; local dev can still log in without keys.
+
+3. **Password:** Still verified on the client today — change `ADMIN_PASSWORD` in `app/admin/layout.tsx`. For stronger protection later, move login to a server API + session cookie.
+
 ## Admin (local)
 
-- URL: [http://localhost:3000/admin](http://localhost:3000/admin)
-- Default password: `hakimi2024` — change in `app/admin/layout.tsx` (`ADMIN_PASSWORD`).
+- With **no** custom path in `.env`: [http://localhost:3000/admin](http://localhost:3000/admin)
+- With custom path: `http://localhost:3000/<ADMIN_SECRET_PATH>`
+- Default password: `hakimi2024` — change in `app/admin/layout.tsx`.
 
 ## Stack
 

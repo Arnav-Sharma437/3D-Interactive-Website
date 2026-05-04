@@ -1,17 +1,32 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { getAdminSession, setAdminSession } from '@/lib/adminSession';
+import { adminUrl } from '@/lib/adminRoutes';
 
-const ADMIN_PASSWORD = 'hakimi2024'; // Change + move to env for production
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (cb: () => void) => void;
+      execute: (siteKey: string, opts: { action: string }) => Promise<string>;
+    };
+  }
+}
+
+/** Change here or replace with server-side login API later — client bundle can expose literals. */
+const ADMIN_PASSWORD = 'hakimi2024';
+
+const RECAPTCHA_SITE = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loginBusy, setLoginBusy] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
@@ -20,15 +35,75 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setSessionChecked(true);
   }, []);
 
-  const tryLogin = () => {
-    if (password === ADMIN_PASSWORD) {
-      setAdminSession(true);
-      setAuthenticated(true);
-      setError('');
-    } else {
-      setError('Incorrect password');
+  const verifyCaptcha = useCallback(async (): Promise<boolean> => {
+    if (!RECAPTCHA_SITE) {
+      if (process.env.NODE_ENV === 'development') return true;
+      setError('reCAPTCHA is not configured. Add keys in Vercel / .env — see .env.example');
+      return false;
+    }
+    await new Promise<void>(resolve => {
+      if (window.grecaptcha?.ready) {
+        window.grecaptcha.ready(() => resolve());
+      } else {
+        setTimeout(resolve, 400);
+      }
+    });
+    if (!window.grecaptcha) {
+      setError('reCAPTCHA failed to load. Refresh and try again.');
+      return false;
+    }
+    const token = await window.grecaptcha.execute(RECAPTCHA_SITE, { action: 'admin_login' });
+    const res = await fetch('/api/verify-recaptcha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    const data = await res.json();
+    if (!data.success) {
+      setError(typeof data.error === 'string' ? data.error : 'Security verification failed');
+      return false;
+    }
+    return true;
+  }, []);
+
+  const tryLogin = async () => {
+    setError('');
+    setLoginBusy(true);
+    try {
+      const okCap = await verifyCaptcha();
+      if (!okCap) return;
+      if (password === ADMIN_PASSWORD) {
+        setAdminSession(true);
+        setAuthenticated(true);
+        setError('');
+      } else {
+        setError('Incorrect password');
+      }
+    } finally {
+      setLoginBusy(false);
     }
   };
+
+  const navMatch = (href: string) => {
+    const root = adminUrl();
+    if (href === root) return pathname === root;
+    if (href === adminUrl('products/new')) return pathname === href;
+    if (href === adminUrl('products')) return pathname === href || pathname.startsWith(`${href}/`);
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const navItems = [
+    { label: 'Dashboard', href: adminUrl(), icon: '📊' },
+    { label: 'Products', href: adminUrl('products'), icon: '📦' },
+    { label: 'Add Product', href: adminUrl('products/new'), icon: '➕' },
+  ];
+
+  const linkClass = (href: string) =>
+    `flex items-center gap-3 rounded-sm px-4 py-3 font-body text-xs uppercase tracking-widest transition-all ${
+      navMatch(href)
+        ? 'border-l-2 border-gold bg-gold/10 text-gold'
+        : 'text-stone-600 hover:bg-stone-200/80 dark:text-gray-500 dark:hover:bg-white/5 dark:hover:text-white'
+    }`;
 
   if (!sessionChecked) {
     return (
@@ -40,56 +115,61 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!authenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-stone-100 px-4 dark:bg-[#0A0A0A]">
-        <div className="w-full max-w-sm border border-stone-200 bg-white px-8 py-12 shadow-lg dark:border-[#1E1E1E] dark:bg-[#111] dark:shadow-none">
-          <div className="mb-10 text-center">
-            <div className="mb-1 font-display text-3xl font-bold tracking-widest gold-text">HAKIMI</div>
-            <div className="font-body text-[10px] uppercase tracking-[0.4em] text-stone-500 dark:text-gray-600">Admin Panel</div>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <label className="mb-2 block font-body text-xs uppercase tracking-widest text-stone-600 dark:text-gray-600">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') tryLogin();
-                }}
-                className="admin-input"
-                placeholder="Enter admin password"
-              />
-              {error && <p className="mt-2 font-body text-xs text-red-600 dark:text-red-400">{error}</p>}
+      <>
+        {RECAPTCHA_SITE ? (
+          <Script src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE}`} strategy="afterInteractive" />
+        ) : null}
+        <div className="flex min-h-screen items-center justify-center bg-stone-100 px-4 dark:bg-[#0A0A0A]">
+          <div className="w-full max-w-sm border border-stone-200 bg-white px-8 py-12 shadow-lg dark:border-[#1E1E1E] dark:bg-[#111] dark:shadow-none">
+            <div className="mb-10 text-center">
+              <div className="mb-1 font-display text-3xl font-bold tracking-widest gold-text">HAKIMI</div>
+              <div className="font-body text-[10px] uppercase tracking-[0.4em] text-stone-500 dark:text-gray-600">Staff Panel</div>
             </div>
-            <button
-              onClick={tryLogin}
-              className="w-full bg-gold py-3 font-body text-xs font-medium uppercase tracking-widest text-black transition-colors hover:bg-gold-light"
-            >
-              Login
-            </button>
-            <p className="text-center font-body text-xs text-stone-500 dark:text-gray-700">Default: hakimi2024</p>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-2 block font-body text-xs uppercase tracking-widest text-stone-600 dark:text-gray-600">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') void tryLogin();
+                  }}
+                  className="admin-input"
+                  placeholder="Enter password"
+                  autoComplete="current-password"
+                />
+                {error && <p className="mt-2 font-body text-xs text-red-600 dark:text-red-400">{error}</p>}
+              </div>
+              <button
+                type="button"
+                disabled={loginBusy}
+                onClick={() => void tryLogin()}
+                className="flex w-full items-center justify-center gap-2 bg-gold py-3 font-body text-xs font-medium uppercase tracking-widest text-black transition-colors hover:bg-gold-light disabled:opacity-60"
+              >
+                {loginBusy && (
+                  <span className="h-3 w-3 animate-spin rounded-full border border-black border-t-transparent" />
+                )}
+                Login
+              </button>
+              {!RECAPTCHA_SITE && (
+                <p className="text-center font-body text-[11px] text-amber-700 dark:text-amber-600">
+                  Set NEXT_PUBLIC_RECAPTCHA_SITE_KEY and RECAPTCHA_SECRET_KEY for production. Dev mode allows login without
+                  keys.
+                </p>
+              )}
+              <p className="text-center font-body text-[10px] text-stone-400 dark:text-gray-600">
+                Protected by Google reCAPTCHA v3
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  const navItems = [
-    { label: 'Dashboard', href: '/admin', icon: '📊' },
-    { label: 'Products', href: '/admin/products', icon: '📦' },
-    { label: 'Add Product', href: '/admin/products/new', icon: '➕' },
-  ];
-
-  const linkClass = (active: boolean) =>
-    `flex items-center gap-3 rounded-sm px-4 py-3 font-body text-xs uppercase tracking-widest transition-all ${
-      active
-        ? 'border-l-2 border-gold bg-gold/10 text-gold'
-        : 'text-stone-600 hover:bg-stone-200/80 dark:text-gray-500 dark:hover:bg-white/5 dark:hover:text-white'
-    }`;
-
   return (
     <div className="min-h-screen bg-stone-100 text-stone-900 dark:bg-[#060606] dark:text-white">
-      {/* Mobile top bar */}
       <header className="fixed left-0 right-0 top-0 z-50 flex h-14 items-center justify-between border-b border-stone-200 bg-stone-100/95 px-4 backdrop-blur-md dark:border-[#1E1E1E] dark:bg-[#060606]/95 md:hidden">
         <button
           type="button"
@@ -105,7 +185,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </Link>
       </header>
 
-      {/* Overlay */}
       {sidebarOpen && (
         <button
           type="button"
@@ -115,7 +194,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed bottom-0 left-0 top-0 z-[70] flex h-full w-60 flex-col border-r border-stone-200 bg-white transition-transform duration-300 dark:border-[#1E1E1E] dark:bg-[#080808] md:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
@@ -135,22 +213,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3 md:p-4">
           {navItems.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setSidebarOpen(false)}
-              className={linkClass(pathname === item.href)}
-            >
+            <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)} className={linkClass(item.href)}>
               <span>{item.icon}</span>
               {item.label}
             </Link>
           ))}
         </nav>
         <div className="border-t border-stone-200 p-4 dark:border-[#1E1E1E]">
-          <Link
-            href="/"
-            className="block font-body text-xs uppercase tracking-widest text-stone-600 transition hover:text-gold dark:text-gray-600"
-          >
+          <Link href="/" className="block font-body text-xs uppercase tracking-widest text-stone-600 transition hover:text-gold dark:text-gray-600">
             ← View Site
           </Link>
           <button
@@ -166,7 +236,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main */}
       <main className="min-h-screen w-full min-w-0 overflow-x-hidden pt-14 md:ml-60 md:pt-0">{children}</main>
     </div>
   );

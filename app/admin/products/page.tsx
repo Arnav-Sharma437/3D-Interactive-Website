@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getAdminProducts, deleteProduct, updateProduct } from '@/lib/adminStore';
 import { imageUnoptimized } from '@/lib/imageUtils';
+import { adminUrl } from '@/lib/adminRoutes';
 import type { Product } from '@/lib/products';
 
 export default function AdminProductsPage() {
@@ -40,7 +41,7 @@ export default function AdminProductsPage() {
           <p className="mt-1 font-body text-sm text-stone-600 dark:text-gray-500">{products.length} products total</p>
         </div>
         <Link
-          href="/admin/products/new"
+          href={adminUrl('products/new')}
           className="inline-flex justify-center bg-gold px-6 py-3 font-body text-xs font-medium uppercase tracking-widest text-black transition-colors hover:bg-gold-light"
         >
           + Add Product
@@ -103,7 +104,7 @@ export default function AdminProductsPage() {
       {products.length === 0 && (
         <div className="py-20 text-center">
           <p className="mb-4 font-body text-stone-600 dark:text-gray-600">No products yet</p>
-          <Link href="/admin/products/new" className="text-sm text-gold hover:underline">
+          <Link href={adminUrl('products/new')} className="text-sm text-gold hover:underline">
             Add your first product →
           </Link>
         </div>

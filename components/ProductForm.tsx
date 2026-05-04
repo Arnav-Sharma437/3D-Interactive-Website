@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { addProduct, updateProduct, generateSlug } from '@/lib/adminStore';
+import { adminUrl } from '@/lib/adminRoutes';
 import { CATEGORIES } from '@/lib/products';
 import type { Product } from '@/lib/products';
 import { fileToCompressedDataUrl } from '@/lib/resizeImage';
@@ -144,7 +145,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
     setSaving(false);
     setSuccess(true);
     setTimeout(() => {
-      router.push('/admin/products');
+      router.push(adminUrl('products'));
     }, 800);
   };
 
@@ -317,7 +318,7 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
         </button>
         <button
           type="button"
-          onClick={() => router.push('/admin/products')}
+          onClick={() => router.push(adminUrl('products'))}
           className="border border-stone-300 dark:border-[#1E1E1E] hover:border-gold/50 text-stone-600 dark:text-gray-500 hover:text-stone-900 dark:hover:text-white px-6 py-3.5 text-xs tracking-widest uppercase font-body transition-all"
         >
           Cancel

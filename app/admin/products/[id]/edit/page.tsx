@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getAdminProducts } from '@/lib/adminStore';
+import { adminUrl } from '@/lib/adminRoutes';
 import ProductForm from '@/components/ProductForm';
 import Link from 'next/link';
 import type { Product } from '@/lib/products';
@@ -32,7 +33,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     return (
       <div className="p-6 md:p-8">
         <p className="text-stone-600 dark:text-gray-500 font-body">Product not found. It may have been removed or the link is invalid.</p>
-        <Link href="/admin/products" className="mt-4 inline-block text-xs tracking-widest text-gold hover:underline font-body">
+        <Link href={adminUrl('products')} className="mt-4 inline-block text-xs tracking-widest text-gold hover:underline font-body">
           ← Back to products
         </Link>
       </div>
@@ -43,7 +44,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     <div className="p-6 md:p-8">
       <div className="mb-8">
         <Link
-          href="/admin/products"
+          href={adminUrl('products')}
           className="text-xs text-stone-600 hover:text-gold dark:text-gray-600 tracking-widest uppercase font-body transition-colors"
         >
           ← Back to Products

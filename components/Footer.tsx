@@ -34,7 +34,6 @@ export default function Footer() {
                 ['Products', '/products'],
                 ['About Us', '/#about'],
                 ['Contact', '/#contact'],
-                ['Admin', '/admin'],
               ] as const
             ).map(([l, h]) => (
               <li key={l}>

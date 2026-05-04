@@ -1,12 +1,13 @@
 import ProductForm from '@/components/ProductForm';
 import Link from 'next/link';
+import { adminUrl } from '@/lib/adminRoutes';
 
 export default function NewProductPage() {
   return (
     <div className="p-4 sm:p-6 md:p-8">
       <div className="mb-8">
         <Link
-          href="/admin/products"
+          href={adminUrl('products')}
           className="font-body text-xs uppercase tracking-widest text-stone-600 transition hover:text-gold dark:text-gray-600"
         >
           ← Back to Products

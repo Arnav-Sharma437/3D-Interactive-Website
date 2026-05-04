@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getAdminProducts } from '@/lib/adminStore';
+import { adminUrl } from '@/lib/adminRoutes';
 import type { Product } from '@/lib/products';
 
 export default function AdminDashboard() {
@@ -47,7 +48,7 @@ export default function AdminDashboard() {
 
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:gap-4 md:mb-10">
         <Link
-          href="/admin/products/new"
+          href={adminUrl('products/new')}
           className="inline-flex justify-center bg-gold px-6 py-3 font-body text-xs font-medium uppercase tracking-widest text-black transition-colors hover:bg-gold-light"
         >
           + Add New Product
@@ -90,7 +91,7 @@ export default function AdminDashboard() {
                     </span>
                   </td>
                   <td className="px-3 py-3 md:px-5">
-                    <Link href={`/admin/products/${p.id}/edit`} className="mr-3 text-xs text-gold hover:underline">
+                    <Link href={adminUrl(`products/${p.id}/edit`)} className="mr-3 text-xs text-gold hover:underline">
                       Edit
                     </Link>
                     <Link href={`/product/${p.slug}`} target="_blank" className="text-xs text-stone-600 hover:text-gold dark:text-gray-600">
@@ -103,7 +104,7 @@ export default function AdminDashboard() {
           </table>
         </div>
         <div className="mt-3 text-right">
-          <Link href="/admin/products" className="font-body text-xs uppercase tracking-widest text-gold hover:underline">
+          <Link href={adminUrl('products')} className="font-body text-xs uppercase tracking-widest text-gold hover:underline">
             View All Products →
           </Link>
         </div>

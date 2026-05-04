@@ -70,13 +70,6 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
-          <Link
-            href="/admin"
-            className="font-body text-sm font-medium uppercase tracking-widest text-stone-500 transition-colors hover:text-gold dark:text-gray-500"
-            title="Staff"
-          >
-            Admin
-          </Link>
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
@@ -123,10 +116,7 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
-          <div className="flex items-center justify-between border-t border-stone-200 pt-4 dark:border-[#1E1E1E]">
-            <Link href="/admin" className="font-body text-sm uppercase tracking-widest text-stone-500 hover:text-gold" onClick={() => setMenuOpen(false)}>
-              Admin
-            </Link>
+          <div className="flex items-center justify-end border-t border-stone-200 pt-4 dark:border-[#1E1E1E]">
             <ThemeToggle />
           </div>
         </div>
