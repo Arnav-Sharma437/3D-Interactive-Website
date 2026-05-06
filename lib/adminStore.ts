@@ -1,52 +1,68 @@
-import { Product, PRODUCTS } from './products';
+import type { Product } from './products';
+import { PRODUCTS } from './products';
+import { db } from '@/lib/firebaseClient';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
 
-const STORAGE_KEY = 'hakimi_products';
+const COLLECTION = 'products';
 
-export function getAdminProducts(): Product[] {
-  if (typeof window === 'undefined') return PRODUCTS;
+export function generateSlug(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+export async function getAdminProducts(): Promise<Product[]> {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(PRODUCTS));
-    return PRODUCTS;
+    const q = query(collection(db, COLLECTION), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    const items = snap.docs.map(d => d.data() as Product);
+    return items.length ? items : PRODUCTS;
   } catch {
+    // If Firestore is not configured yet, fall back to seed.
     return PRODUCTS;
   }
 }
 
-export function saveAdminProducts(products: Product[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+export async function getProductById(id: string): Promise<Product | null> {
+  try {
+    const ref = doc(db, COLLECTION, id);
+    const snap = await getDoc(ref);
+    return snap.exists() ? (snap.data() as Product) : null;
+  } catch {
+    return null;
+  }
 }
 
-export function addProduct(product: Omit<Product, 'id' | 'createdAt'>): Product {
-  const products = getAdminProducts();
-  const newProduct: Product = {
-    ...product,
-    id: Date.now().toString(),
-    createdAt: new Date().toISOString(),
-  };
-  saveAdminProducts([...products, newProduct]);
+export async function addProduct(product: Omit<Product, 'id' | 'createdAt'>): Promise<Product> {
+  const id = Date.now().toString();
+  const newProduct: Product = { ...product, id, createdAt: new Date().toISOString() };
+  await setDoc(doc(db, COLLECTION, id), newProduct);
   return newProduct;
 }
 
-export function updateProduct(id: string, updates: Partial<Product>): Product | null {
-  const products = getAdminProducts();
-  const idx = products.findIndex(p => p.id === id);
-  if (idx === -1) return null;
-  products[idx] = { ...products[idx], ...updates };
-  saveAdminProducts(products);
-  return products[idx];
+export async function updateProduct(id: string, updates: Partial<Product>): Promise<Product | null> {
+  try {
+    await updateDoc(doc(db, COLLECTION, id), updates as Record<string, unknown>);
+    const updated = await getProductById(id);
+    return updated;
+  } catch {
+    return null;
+  }
 }
 
-export function deleteProduct(id: string): boolean {
-  const products = getAdminProducts();
-  const filtered = products.filter(p => p.id !== id);
-  if (filtered.length === products.length) return false;
-  saveAdminProducts(filtered);
-  return true;
-}
-
-export function generateSlug(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+export async function deleteProduct(id: string): Promise<boolean> {
+  try {
+    await deleteDoc(doc(db, COLLECTION, id));
+    return true;
+  } catch {
+    return false;
+  }
 }

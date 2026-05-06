@@ -137,9 +137,9 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
     await new Promise(r => setTimeout(r, 300));
 
     if (isEdit && productId) {
-      updateProduct(productId, productData);
+      await updateProduct(productId, productData);
     } else {
-      addProduct(productData);
+      await addProduct(productData);
     }
 
     setSaving(false);

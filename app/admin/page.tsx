@@ -10,7 +10,14 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    setProducts(getAdminProducts());
+    let alive = true;
+    (async () => {
+      const items = await getAdminProducts();
+      if (alive) setProducts(items);
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const stats = {

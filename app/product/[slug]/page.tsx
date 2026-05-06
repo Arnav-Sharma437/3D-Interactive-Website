@@ -19,13 +19,20 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const products = getAdminProducts();
-    const found = products.find(p => p.slug === slug) || PRODUCTS.find(p => p.slug === slug);
-    if (found) {
-      setProduct(found);
-      setRelated(products.filter(p => p.category === found.category && p.id !== found.id).slice(0, 4));
-    }
-    setLoaded(true);
+    let alive = true;
+    (async () => {
+      const products = await getAdminProducts();
+      const found = products.find(p => p.slug === slug) || PRODUCTS.find(p => p.slug === slug);
+      if (!alive) return;
+      if (found) {
+        setProduct(found);
+        setRelated(products.filter(p => p.category === found.category && p.id !== found.id).slice(0, 4));
+      }
+      setLoaded(true);
+    })();
+    return () => {
+      alive = false;
+    };
   }, [slug]);
 
   useEffect(() => {

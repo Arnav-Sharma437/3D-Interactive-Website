@@ -22,7 +22,15 @@ export default function HomePage() {
   const [featured, setFeatured] = useState<Product[]>([]);
 
   useEffect(() => {
-    setFeatured(getAdminProducts().filter(p => p.featured && p.available));
+    let alive = true;
+    (async () => {
+      const items = await getAdminProducts();
+      const f = items.filter(p => p.featured && p.available);
+      if (alive) setFeatured(f);
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   /** Deep links: /#about, /#contact after navigation from other pages */

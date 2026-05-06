@@ -13,24 +13,37 @@ export default function AdminProductsPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
-    setProducts(getAdminProducts());
+    let alive = true;
+    (async () => {
+      const items = await getAdminProducts();
+      if (alive) setProducts(items);
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const handleDelete = (id: string, name: string) => {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
     setDeleting(id);
     setTimeout(() => {
-      deleteProduct(id);
-      setProducts(getAdminProducts());
-      setDeleting(null);
+      (async () => {
+        await deleteProduct(id);
+        const items = await getAdminProducts();
+        setProducts(items);
+        setDeleting(null);
+      })();
     }, 400);
   };
 
   const handleToggleAvailable = (id: string) => {
     const product = products.find(p => p.id === id);
     if (!product) return;
-    updateProduct(id, { available: !product.available });
-    setProducts(getAdminProducts());
+    (async () => {
+      await updateProduct(id, { available: !product.available });
+      const items = await getAdminProducts();
+      setProducts(items);
+    })();
   };
 
   return (

@@ -17,7 +17,14 @@ export default function ProductsContent() {
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
 
   useEffect(() => {
-    setProducts(getAdminProducts());
+    let alive = true;
+    (async () => {
+      const items = await getAdminProducts();
+      if (alive) setProducts(items);
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
