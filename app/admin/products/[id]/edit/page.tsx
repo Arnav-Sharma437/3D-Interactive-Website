@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getAdminProducts } from '@/lib/adminStore';
+import { getProductById } from '@/lib/adminStore';
 import { adminUrl } from '@/lib/adminRoutes';
 import ProductForm from '@/components/ProductForm';
 import Link from 'next/link';
@@ -13,9 +13,14 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [product, setProduct] = useState<Product | null | undefined>(undefined);
 
   useEffect(() => {
-    const products = getAdminProducts();
-    const found = products.find(p => p.id === id);
-    setProduct(found ?? null);
+    let alive = true;
+    (async () => {
+      const found = await getProductById(id);
+      if (alive) setProduct(found ?? null);
+    })();
+    return () => {
+      alive = false;
+    };
   }, [id]);
 
   if (product === undefined) {
