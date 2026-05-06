@@ -1,84 +1,56 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
 import { usePathname } from 'next/navigation';
-import { getAdminSession, setAdminSession } from '@/lib/adminSession';
 import { adminUrl } from '@/lib/adminRoutes';
-
-declare global {
-  interface Window {
-    grecaptcha?: {
-      ready: (cb: () => void) => void;
-      execute: (siteKey: string, opts: { action: string }) => Promise<string>;
-    };
-  }
-}
-
-/** Change here or replace with server-side login API later — client bundle can expose literals. */
-const ADMIN_PASSWORD = 'hakimi2024';
-
-const RECAPTCHA_SITE = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
+import { adminGoogleLogin, adminLogout, isAllowedAdminEmail } from '@/lib/adminAuth';
+import { getFirebaseAuth } from '@/lib/firebaseClient';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loginBusy, setLoginBusy] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    if (getAdminSession()) setAuthenticated(true);
-    setSessionChecked(true);
-  }, []);
-
-  const verifyCaptcha = useCallback(async (): Promise<boolean> => {
-    if (!RECAPTCHA_SITE) {
-      if (process.env.NODE_ENV === 'development') return true;
-      setError('reCAPTCHA is not configured. Add keys in Vercel / .env — see .env.example');
-      return false;
-    }
-    await new Promise<void>(resolve => {
-      if (window.grecaptcha?.ready) {
-        window.grecaptcha.ready(() => resolve());
-      } else {
-        setTimeout(resolve, 400);
+    let unsub: (() => void) | null = null;
+    (async () => {
+      try {
+        const auth = await getFirebaseAuth();
+        unsub = onAuthStateChanged(auth, async (user) => {
+          const ok = isAllowedAdminEmail(user?.email);
+          if (user && !ok) {
+            await adminLogout();
+            setAuthenticated(false);
+            setError('This Google account is not allowed for admin.');
+          } else {
+            setAuthenticated(!!user && ok);
+          }
+          setSessionChecked(true);
+        });
+      } catch (e) {
+        setSessionChecked(true);
+        setAuthenticated(false);
+        setError(e instanceof Error ? e.message : 'Firebase is not configured. Check Vercel env vars.');
       }
-    });
-    if (!window.grecaptcha) {
-      setError('reCAPTCHA failed to load. Refresh and try again.');
-      return false;
-    }
-    const token = await window.grecaptcha.execute(RECAPTCHA_SITE, { action: 'admin_login' });
-    const res = await fetch('/api/verify-recaptcha', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
-    });
-    const data = await res.json();
-    if (!data.success) {
-      setError(typeof data.error === 'string' ? data.error : 'Security verification failed');
-      return false;
-    }
-    return true;
+    })();
+    return () => {
+      unsub?.();
+    };
   }, []);
 
   const tryLogin = async () => {
     setError('');
     setLoginBusy(true);
     try {
-      const okCap = await verifyCaptcha();
-      if (!okCap) return;
-      if (password === ADMIN_PASSWORD) {
-        setAdminSession(true);
-        setAuthenticated(true);
-        setError('');
-      } else {
-        setError('Incorrect password');
-      }
+      await adminGoogleLogin();
+      // auth state listener will set authenticated
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Login failed');
     } finally {
       setLoginBusy(false);
     }
@@ -115,56 +87,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!authenticated) {
     return (
-      <>
-        {RECAPTCHA_SITE ? (
-          <Script src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE}`} strategy="afterInteractive" />
-        ) : null}
-        <div className="flex min-h-screen items-center justify-center bg-stone-100 px-4 dark:bg-[#0A0A0A]">
-          <div className="w-full max-w-sm border border-stone-200 bg-white px-8 py-12 shadow-lg dark:border-[#1E1E1E] dark:bg-[#111] dark:shadow-none">
-            <div className="mb-10 text-center">
-              <div className="mb-1 font-display text-3xl font-bold tracking-widest gold-text">HAKIMI</div>
-              <div className="font-body text-[10px] uppercase tracking-[0.4em] text-stone-500 dark:text-gray-600">Staff Panel</div>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="mb-2 block font-body text-xs uppercase tracking-widest text-stone-600 dark:text-gray-600">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') void tryLogin();
-                  }}
-                  className="admin-input"
-                  placeholder="Enter password"
-                  autoComplete="current-password"
-                />
-                {error && <p className="mt-2 font-body text-xs text-red-600 dark:text-red-400">{error}</p>}
-              </div>
-              <button
-                type="button"
-                disabled={loginBusy}
-                onClick={() => void tryLogin()}
-                className="flex w-full items-center justify-center gap-2 bg-gold py-3 font-body text-xs font-medium uppercase tracking-widest text-black transition-colors hover:bg-gold-light disabled:opacity-60"
-              >
-                {loginBusy && (
-                  <span className="h-3 w-3 animate-spin rounded-full border border-black border-t-transparent" />
-                )}
-                Login
-              </button>
-              {!RECAPTCHA_SITE && (
-                <p className="text-center font-body text-[11px] text-amber-700 dark:text-amber-600">
-                  Set NEXT_PUBLIC_RECAPTCHA_SITE_KEY and RECAPTCHA_SECRET_KEY for production. Dev mode allows login without
-                  keys.
-                </p>
-              )}
-              <p className="text-center font-body text-[10px] text-stone-400 dark:text-gray-600">
-                Protected by Google reCAPTCHA v3
-              </p>
-            </div>
+      <div className="flex min-h-screen items-center justify-center bg-stone-100 px-4 dark:bg-[#0A0A0A]">
+        <div className="w-full max-w-sm border border-stone-200 bg-white px-8 py-12 shadow-lg dark:border-[#1E1E1E] dark:bg-[#111] dark:shadow-none">
+          <div className="mb-10 text-center">
+            <div className="mb-1 font-display text-3xl font-bold tracking-widest gold-text">HAKIMI</div>
+            <div className="font-body text-[10px] uppercase tracking-[0.4em] text-stone-500 dark:text-gray-600">Staff Panel</div>
+          </div>
+          <div className="space-y-4">
+            {error && <p className="rounded border border-red-300 bg-red-50 px-4 py-3 font-body text-xs text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300">{error}</p>}
+            <button
+              type="button"
+              disabled={loginBusy}
+              onClick={() => void tryLogin()}
+              className="flex w-full items-center justify-center gap-2 bg-gold py-3 font-body text-xs font-medium uppercase tracking-widest text-black transition-colors hover:bg-gold-light disabled:opacity-60"
+            >
+              {loginBusy && <span className="h-3 w-3 animate-spin rounded-full border border-black border-t-transparent" />}
+              Continue with Google
+            </button>
+            <p className="text-center font-body text-[11px] text-stone-500 dark:text-gray-600">
+              Access is restricted to allowed admin emails.
+            </p>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -226,7 +171,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <button
             type="button"
             onClick={() => {
-              setAdminSession(false);
+              void adminLogout();
               setAuthenticated(false);
             }}
             className="mt-3 block font-body text-xs uppercase tracking-widest text-red-700 transition hover:text-red-500 dark:text-red-800 dark:hover:text-red-400"

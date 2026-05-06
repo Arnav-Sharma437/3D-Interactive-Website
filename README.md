@@ -55,13 +55,12 @@ Open [http://localhost:3000](http://localhost:3000).
 
    Then open `https://yoursite.vercel.app/<that-segment>` — ** `/admin` redirects home** when a custom secret is set.
 
-2. **reCAPTCHA v3:** [Google Admin Console](https://www.google.com/recaptcha/admin) → register site → copy:
-   - `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`
-   - `RECAPTCHA_SECRET_KEY`
+2. **Google login (recommended):** Enable Google sign-in in Firebase Auth, then restrict to allowed emails via:
+   - `NEXT_PUBLIC_ADMIN_EMAILS` (comma-separated)
 
-   Without keys, **production login is blocked**; local dev can still log in without keys.
+   Admin login uses Google Sign-in; only allowlisted emails can access write operations.
 
-3. **Password:** Still verified on the client today — change `ADMIN_PASSWORD` in `app/admin/layout.tsx`. For stronger protection later, move login to a server API + session cookie.
+3. **Optional extra protection:** You can also add reCAPTCHA v3 later if you want an additional bot check.
 
 ## Admin (local)
 
