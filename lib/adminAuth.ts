@@ -1,5 +1,5 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebaseClient';
+import { getFirebaseAuth } from '@/lib/firebaseClient';
 
 function allowedEmails(): string[] {
   const raw = process.env.NEXT_PUBLIC_ADMIN_EMAILS || '';
@@ -16,6 +16,7 @@ export function isAllowedAdminEmail(email?: string | null): boolean {
 }
 
 export async function adminGoogleLogin(): Promise<void> {
+  const auth = await getFirebaseAuth();
   const provider = new GoogleAuthProvider();
   const result = await signInWithPopup(auth, provider);
   const email = result.user.email;
@@ -26,6 +27,7 @@ export async function adminGoogleLogin(): Promise<void> {
 }
 
 export async function adminLogout(): Promise<void> {
+  const auth = await getFirebaseAuth();
   await signOut(auth);
 }
 
