@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Product } from '@/lib/products';
-import { imageUnoptimized } from '@/lib/imageUtils';
+import { imageUnoptimized, isDataUrl } from '@/lib/imageUtils';
 import { openWhatsApp } from '@/lib/whatsapp';
 
 interface ProductCardProps {
@@ -30,14 +30,24 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     >
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-100 dark:bg-[#0D0D0D]">
-        <Image
-          src={src || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'}
-          alt={product.name}
-          fill
-          className="object-cover product-card-img transition-transform duration-700 ease-out group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          unoptimized={imageUnoptimized(src)}
-        />
+        {isDataUrl(src) ? (
+          // Next/Image can be flaky with big data: URLs — use plain img.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={src}
+            alt={product.name}
+            className="absolute inset-0 h-full w-full object-cover product-card-img transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        ) : (
+          <Image
+            src={src || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'}
+            alt={product.name}
+            fill
+            className="object-cover product-card-img transition-transform duration-700 ease-out group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            unoptimized={imageUnoptimized(src)}
+          />
+        )}
 
         {/* Overlay on hover */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-500 group-hover:bg-black/45">

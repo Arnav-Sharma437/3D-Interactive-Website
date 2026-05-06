@@ -8,7 +8,7 @@ import { PRODUCTS } from '@/lib/products';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import ProductCard from '@/components/ProductCard';
 import type { Product } from '@/lib/products';
-import { imageUnoptimized } from '@/lib/imageUtils';
+import { imageUnoptimized, isDataUrl } from '@/lib/imageUtils';
 
 /** Next.js 14: `params` is a plain object (not a Promise). */
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
@@ -125,15 +125,24 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           <div className="detail-image opacity-0">
             {/* Main image */}
             <div className="relative aspect-[4/3] bg-stone-200 dark:bg-[#0D0D0D] border border-stone-300 dark:border-[#1E1E1E] overflow-hidden mb-4">
-              <Image
-                src={product.images[activeImage]}
-                alt={product.name}
-                fill
-                className="object-cover transition-all duration-700"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-                unoptimized={imageUnoptimized(product.images[activeImage])}
-              />
+              {isDataUrl(product.images[activeImage]) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={product.images[activeImage]}
+                  alt={product.name}
+                  className="absolute inset-0 h-full w-full object-cover transition-all duration-700"
+                />
+              ) : (
+                <Image
+                  src={product.images[activeImage]}
+                  alt={product.name}
+                  fill
+                  className="object-cover transition-all duration-700"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                  unoptimized={imageUnoptimized(product.images[activeImage])}
+                />
+              )}
               {!product.available && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                   <span className="border border-red-400 text-red-400 text-sm tracking-widest uppercase px-6 py-2 font-body">Out of Stock</span>
@@ -157,14 +166,19 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                       activeImage === i ? 'border-gold' : 'border-stone-300 dark:border-[#1E1E1E] hover:border-gold/50'
                     }`}
                   >
-                    <Image
-                      src={img}
-                      alt={`${product.name} ${i + 1}`}
-                      fill
-                      className="object-cover"
-                      sizes="80px"
-                      unoptimized={imageUnoptimized(img)}
-                    />
+                    {isDataUrl(img) ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={img} alt={`${product.name} ${i + 1}`} className="absolute inset-0 h-full w-full object-cover" />
+                    ) : (
+                      <Image
+                        src={img}
+                        alt={`${product.name} ${i + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                        unoptimized={imageUnoptimized(img)}
+                      />
+                    )}
                   </button>
                 ))}
               </div>
