@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { FloatingWhatsApp } from '@/components/WhatsAppButton';
-import StickyCTA from '@/components/StickyCTA';
+import AppShell from '@/components/AppShell';
 
 export const metadata: Metadata = {
   title: {
@@ -28,11 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className="min-h-screen bg-stone-100 text-stone-900 antialiased transition-colors duration-300 dark:bg-[#0A0A0A] dark:text-white font-body">
         <Providers>
-          <Navbar />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-          <FloatingWhatsApp />
-          <StickyCTA />
+          <AppShell>{children}</AppShell>
         </Providers>
       </body>
     </html>

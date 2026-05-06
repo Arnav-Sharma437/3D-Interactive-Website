@@ -4,13 +4,15 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { adminUrl } from '@/lib/adminRoutes';
-import { adminGoogleLogin, adminLogout, isAllowedAdminEmail } from '@/lib/adminAuth';
+import { adminEmailLogin, adminLogout, isAllowedAdminEmail } from '@/lib/adminAuth';
 import { getFirebaseAuth } from '@/lib/firebaseClient';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loginBusy, setLoginBusy] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -47,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setError('');
     setLoginBusy(true);
     try {
-      await adminGoogleLogin();
+      await adminEmailLogin(email.trim(), password);
       // auth state listener will set authenticated
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Login failed');
@@ -95,6 +97,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <div className="space-y-4">
             {error && <p className="rounded border border-red-300 bg-red-50 px-4 py-3 font-body text-xs text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300">{error}</p>}
+            <div className="space-y-3">
+              <div>
+                <label className="mb-2 block font-body text-xs uppercase tracking-widest text-stone-600 dark:text-gray-600">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="admin-input"
+                  placeholder="admin@example.com"
+                  autoComplete="email"
+                />
+              </div>
+              <div>
+                <label className="mb-2 block font-body text-xs uppercase tracking-widest text-stone-600 dark:text-gray-600">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') void tryLogin();
+                  }}
+                  className="admin-input"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
             <button
               type="button"
               disabled={loginBusy}
@@ -102,7 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="flex w-full items-center justify-center gap-2 bg-gold py-3 font-body text-xs font-medium uppercase tracking-widest text-black transition-colors hover:bg-gold-light disabled:opacity-60"
             >
               {loginBusy && <span className="h-3 w-3 animate-spin rounded-full border border-black border-t-transparent" />}
-              Continue with Google
+              Login
             </button>
             <p className="text-center font-body text-[11px] text-stone-500 dark:text-gray-600">
               Access is restricted to allowed admin emails.

@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirebaseAuth } from '@/lib/firebaseClient';
 
 function allowedEmails(): string[] {
@@ -15,12 +15,11 @@ export function isAllowedAdminEmail(email?: string | null): boolean {
   return !!email && allow.includes(email.toLowerCase());
 }
 
-export async function adminGoogleLogin(): Promise<void> {
+export async function adminEmailLogin(email: string, password: string): Promise<void> {
   const auth = await getFirebaseAuth();
-  const provider = new GoogleAuthProvider();
-  const result = await signInWithPopup(auth, provider);
-  const email = result.user.email;
-  if (!isAllowedAdminEmail(email)) {
+  const res = await signInWithEmailAndPassword(auth, email, password);
+  const userEmail = res.user.email;
+  if (!isAllowedAdminEmail(userEmail)) {
     await signOut(auth);
     throw new Error('This account is not allowed to access admin.');
   }

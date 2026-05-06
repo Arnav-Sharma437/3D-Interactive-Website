@@ -136,17 +136,23 @@ export default function ProductForm({ initialData, productId }: ProductFormProps
 
     await new Promise(r => setTimeout(r, 300));
 
-    if (isEdit && productId) {
-      await updateProduct(productId, productData);
-    } else {
-      await addProduct(productData);
+    try {
+      if (isEdit && productId) {
+        const ok = await updateProduct(productId, productData);
+        if (!ok) throw new Error('Update failed. Check Firestore rules / login.');
+      } else {
+        await addProduct(productData);
+      }
+      setSaving(false);
+      setSuccess(true);
+      setTimeout(() => {
+        router.push(adminUrl('products'));
+      }, 800);
+    } catch (err) {
+      setSaving(false);
+      setSuccess(false);
+      setUploadError(err instanceof Error ? err.message : 'Save failed');
     }
-
-    setSaving(false);
-    setSuccess(true);
-    setTimeout(() => {
-      router.push(adminUrl('products'));
-    }, 800);
   };
 
   const inputClass =
